@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS election;
+DROP DATABASE IF EXISTS employeetrack;
 
-CREATE DATABASE election;
-USE election;
+CREATE DATABASE employeetrack;
+USE employeetrack;
