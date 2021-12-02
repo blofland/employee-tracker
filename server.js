@@ -18,12 +18,23 @@ const db = mysql.createConnection(
 
 app.use("/api/employees", (req, res) => {
  db.query(`SELECT * FROM employee`, (err, rows) => {
-   console.log(err)
-   console.log(rows)
     res.send(rows);
  })
 
 })
+app.use("/api/roles", (req, res) => {
+  db.query(`SELECT * FROM role`, (err, rows) => {
+     res.send(rows);
+  })
+ 
+ })
+
+ app.use("/api/departments", (req, res) => {
+  db.query(`SELECT * FROM department`, (err, rows) => {
+     res.send(rows);
+  })
+ 
+ })
 
 app.listen (3001, () => {
   console.log("listening on port 3001")
