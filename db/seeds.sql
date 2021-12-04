@@ -22,3 +22,12 @@ VALUES
   ('HR'),
   ('Operations'),
   ('Tech');
+
+  INSERT INTO role (title, salary, department_id) 
+  VALUES
+  ('Dev', 120000, 2),
+   ('Dev', 120000, 2),
+    ('Bev', 120000, 1),
+     ('Bev', 120000,1),
+      ('Bev', 120000, 1),
+       ('Dev', 120000, 2);
