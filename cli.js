@@ -13,14 +13,25 @@ async function getDepartments() {
 }
 
 async function getRoles() {
-    const sql = "SELECT role.id, role.title, role.salary, department.name FROM role INNER JOIN department ON department_id = department.id"
-    const [departments] = await db.promise().query(sql)
-    console.table(departments)
+    const sql = "SELECT role.id, role.title, role.salary, department.name AS department FROM role INNER JOIN department ON department_id = department.id"
+    const [rows] = await db.promise().query(sql)
+    console.table(rows)
     console.log()
 }
 
+async function getEmployees() {
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.salary, manager.first_name AS manager
+    FROM employee 
+    JOIN role ON employee.role_id = role.id
+    JOIN department ON role.department_id = department.id
+    Join (SELECT * FROM employee) manager ON employee.role_id = manager.id
+`
+    const [rows] = await db.promise().query(sql)
+    console.table(rows)
+    console.log()
+}
 async function mainMenu(){
-    const options = ["View all departments", "View all roles", "Exit"]
+    const options = ["View all departments", "View all roles", "View all employees", "Exit"]
     const answers = await inquirer.prompt({
         type: "list",
         name: "main",
@@ -32,6 +43,10 @@ async function mainMenu(){
                 break;
             case options[1]:
                 await getRoles()
+                mainMenu()
+                break;
+            case options[2]:
+                await getEmployees()
                 mainMenu()
                 break;
             default:
