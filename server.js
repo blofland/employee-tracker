@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const express = require('express');
 const inputCheck = require('./utils/inputCheck');
+const inquirer = require('inquirer')
 const app = express()
 
 // Connect to database
@@ -24,7 +25,7 @@ app.use("/api/roles", (req, res) => {
   })
  })
 
- // Get a single candidate
+ // Get a single employee
 app.get('/api/employees/:id', (req, res) => {
   const sql = `SELECT * FROM employee WHERE id = ?`;
   const params = [req.params.id];
@@ -41,7 +42,7 @@ app.get('/api/employees/:id', (req, res) => {
   });
 });
 
-// Delete a candidate
+// Delete a employee
 app.delete('/api/employees/:id', (req, res) => {
   const sql = `DELETE FROM employee WHERE id = ?`;
   const params = [req.params.id];
