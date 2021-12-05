@@ -30,8 +30,26 @@ async function getEmployees() {
     console.table(rows)
     console.log()
 }
+
+async function addDepartment() {
+    const {department} = await inquirer.prompt({
+        type: "input",
+        message: "What is the name of the department?",
+        name: "department"
+         })
+    const sql = `INSERT INTO department (name) VALUES (?)`
+    try{
+        await db.promise().execute(sql, [`${department}`])
+        console.log() 
+        console.log("Created new department - ", department)   
+        console.log() 
+    } catch(err){
+        console.log(err)
+    } 
+}
+
 async function mainMenu(){
-    const options = ["View all departments", "View all roles", "View all employees", "Exit"]
+    const options = ["View all departments", "View all roles", "View all employees", "Add Department", "Exit"]
     const answers = await inquirer.prompt({
         type: "list",
         name: "main",
@@ -47,6 +65,10 @@ async function mainMenu(){
                 break;
             case options[2]:
                 await getEmployees()
+                mainMenu()
+                break;
+            case options[3]:
+                await addDepartment()
                 mainMenu()
                 break;
             default:
