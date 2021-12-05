@@ -3,7 +3,8 @@ const inputCheck = require('./utils/inputCheck');
 const ctable = require('console.table')
 // Connect to database
  const db = require('./db/connection');
-const inquirer = require('inquirer')
+const inquirer = require('inquirer');
+const { addSnapshotSerializer } = require('expect');
 
 async function getDepartments() {
     const sql = "SELECT id, name FROM department"
@@ -45,11 +46,39 @@ async function addDepartment() {
         console.log() 
     } catch(err){
         console.log(err)
-    } 
+    }
+}
+
+async function addRole() {
+    let [departments] = await db.promise().query("SELECT name, id FROM department")
+        departments = departments.reduce((obj, d) =>{
+            const {name, id} = d 
+            obj[name] = id
+            return obj
+        }, {})
+    const answers = await inquirer.prompt([{
+        type: "input",
+        message: "What is the role title?",
+        name: "title"
+         },
+        {
+            type: "number",
+            message: "What is the salary?",
+            name: "salary"
+            },
+        {
+            type: "list",
+            message: "What is the department for this role?",
+            choices: Object.keys(departments),
+            name: "department"
+        }
+    ])
+    const sql =  "INSERT INTO role (title, salary, department_id) VALUES (?,?,?)"
+    await db.promise().execute(sql, [answers.title, answers.salary, departments[answers.department]])
 }
 
 async function mainMenu(){
-    const options = ["View all departments", "View all roles", "View all employees", "Add Department", "Exit"]
+    const options = ["View all departments", "View all roles", "View all employees", "Add Department", "Add Role", "Exit"]
     const answers = await inquirer.prompt({
         type: "list",
         name: "main",
@@ -69,6 +98,10 @@ async function mainMenu(){
                 break;
             case options[3]:
                 await addDepartment()
+                mainMenu()
+                break;
+            case options[4]:
+                await addRole()
                 mainMenu()
                 break;
             default:
