@@ -173,7 +173,7 @@ async function mainMenu(){
             default:
                 console.log("exited program")
                 // console.log("Press ctrl C to log off :)")
-                process.exit(1)
+                process.exit(0)
                 break;
         }
         

@@ -2,10 +2,10 @@
   "name": "employee-tracker",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "cli.js",
   "scripts": {
     "test": "jest",
-    "start": "node server.js"
+    "start": "node cli.js"
   },
   "repository": {
     "type": "git",
