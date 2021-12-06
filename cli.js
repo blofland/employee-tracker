@@ -25,7 +25,7 @@ async function getEmployees() {
     FROM employee 
     JOIN role ON employee.role_id = role.id
     JOIN department ON role.department_id = department.id
-    Join (SELECT * FROM employee) manager ON employee.role_id = manager.id
+    JOIN (SELECT id, first_name, last_name FROM employee) manager ON employee.manager_id = manager.id
 `
     const [rows] = await db.promise().query(sql)
     console.table(rows)
@@ -77,8 +77,70 @@ async function addRole() {
     await db.promise().execute(sql, [answers.title, answers.salary, departments[answers.department]])
 }
 
+async function addEmployee(){
+    let [roles] = await db.promise().query("SELECT title, id FROM role")
+    roles = roles.reduce((obj, d) =>{
+        const {title, id} = d 
+        obj[title] = id
+        return obj
+    }, {}) 
+
+    let [employees] = await db.promise().query("SELECT id, first_name, last_name FROM employee")
+    employees = employees.reduce((obj, e) => {
+        const {id, first_name, last_name} = e 
+        obj[`${first_name} ${last_name}`] = id 
+        return obj
+    }, {
+        "No manager": null 
+    })
+
+
+
+    const {first, last, role, manager} = await inquirer.prompt([
+        {
+            type: "input",
+            message: "What is their first name?",
+            name: "first"
+        },
+        {   
+            type: "input",
+            message: "What is their last name?",
+            name: "last"
+        },
+        {
+            type: "list",
+            message: "What is their role?",
+            choices: Object.keys(roles),
+            name: "role"
+        },
+        {   
+            type: "list",
+            message: "What is the manager's Name?",
+            choices: Object.keys(employees),
+            name: "manager" 
+
+        }
+    ])
+    
+    console.log({
+        manager: employees[manager]
+    })
+
+    try {
+        const sql =  "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)"
+        const alt = "INSERT INTO employee (first_name, last_name, role_id) VALUES (?,?,?)"
+        if(employees[manager])await db.promise().execute(sql, [first, last, roles[role], employees[manager]])
+        else await db.promise().execute(alt, [first, last, roles[role]])
+        
+    } catch (err){
+        console.log(err)
+    }
+    
+    
+}
+
 async function mainMenu(){
-    const options = ["View all departments", "View all roles", "View all employees", "Add Department", "Add Role", "Exit"]
+    const options = ["View all departments", "View all roles", "View all employees", "Add Department", "Add Role", "Add Employee", "Exit"]
     const answers = await inquirer.prompt({
         type: "list",
         name: "main",
@@ -104,9 +166,14 @@ async function mainMenu(){
                 await addRole()
                 mainMenu()
                 break;
+            case options[5]:
+                await addEmployee()
+                mainMenu()
+                break;
             default:
                 console.log("exited program")
-                console.log("Press ctrl C to log off :)")
+                // console.log("Press ctrl C to log off :)")
+                process.exit(1)
                 break;
         }
         
